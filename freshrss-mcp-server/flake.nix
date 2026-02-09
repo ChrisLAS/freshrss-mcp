@@ -6,33 +6,40 @@
     flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { self, nixpkgs, flake-utils }:
-    flake-utils.lib.eachDefaultSystem (system:
+  outputs =
+    {
+      self,
+      nixpkgs,
+      flake-utils,
+    }:
+    flake-utils.lib.eachDefaultSystem (
+      system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
         python = pkgs.python311;
-        
+
         # Build the package
         freshrss-mcp-server = pkgs.python311Packages.buildPythonApplication {
           pname = "freshrss-mcp-server";
           version = "0.1.0";
-          
+          pyproject = true;
+
           src = ./.;
-          
+
           nativeBuildInputs = with pkgs.python311Packages; [
             hatchling
           ];
-          
+
           propagatedBuildInputs = with pkgs.python311Packages; [
             mcp
             httpx
             pydantic
           ];
-          
+
           meta = with pkgs.lib; {
             description = "MCP server for FreshRSS integration";
             license = licenses.mit;
-            maintainers = [];
+            maintainers = [ ];
           };
         };
       in
@@ -55,7 +62,7 @@
             python311
             ruff
           ];
-          
+
           shellHook = ''
             echo "FreshRSS MCP Server development environment"
             echo "Run 'uv sync' to install dependencies"
@@ -63,20 +70,32 @@
           '';
         };
       }
-    ) // {
+    )
+    // {
       # NixOS module
-      nixosModules.default = { config, lib, pkgs, ... }:
+      nixosModules.default =
+        {
+          config,
+          lib,
+          pkgs,
+          ...
+        }:
         with lib;
         let
           cfg = config.services.freshrss-mcp-server;
           python = pkgs.python311;
-          
+
           freshrss-mcp-server = pkgs.python311Packages.buildPythonApplication {
             pname = "freshrss-mcp-server";
             version = "0.1.0";
+            pyproject = true;
             src = ./.;
             nativeBuildInputs = with pkgs.python311Packages; [ hatchling ];
-            propagatedBuildInputs = with pkgs.python311Packages; [ mcp httpx pydantic ];
+            propagatedBuildInputs = with pkgs.python311Packages; [
+              mcp
+              httpx
+              pydantic
+            ];
           };
         in
         {
@@ -145,7 +164,7 @@
               serviceConfig = {
                 Type = "simple";
                 ExecStart = "${freshrss-mcp-server}/bin/freshrss-mcp-server";
-                
+
                 # Environment variables
                 Environment = [
                   "FRESHRSS_URL=${cfg.freshRssUrl}"
@@ -156,10 +175,10 @@
                   "DEFAULT_ARTICLE_LIMIT=${toString cfg.defaultArticleLimit}"
                   "DEFAULT_SUMMARY_LENGTH=${toString cfg.defaultSummaryLength}"
                 ];
-                
+
                 # Load password from file
                 EnvironmentFile = cfg.passwordFile;
-                
+
                 # Systemd hardening
                 DynamicUser = true;
                 PrivateTmp = true;
@@ -174,7 +193,7 @@
                 RestrictRealtime = true;
                 SystemCallFilter = "@system-service";
                 SystemCallArchitectures = "native";
-                
+
                 Restart = "on-failure";
                 RestartSec = 5;
               };
