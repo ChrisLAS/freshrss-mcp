@@ -2,13 +2,12 @@
 
 import os
 from dataclasses import dataclass
-from typing import Optional
 
 
 @dataclass
 class Config:
     """Server configuration from environment variables."""
-    
+
     freshrss_url: str
     freshrss_username: str
     freshrss_password: str
@@ -17,16 +16,16 @@ class Config:
     mcp_server_host: str = "0.0.0.0"
     default_article_limit: int = 20
     default_summary_length: int = 500
-    
+
     @classmethod
     def from_env(cls) -> "Config":
         """Load configuration from environment variables."""
         required_vars = ["FRESHRSS_URL", "FRESHRSS_USERNAME", "FRESHRSS_PASSWORD"]
         missing = [var for var in required_vars if not os.getenv(var)]
-        
+
         if missing:
             raise ValueError(f"Missing required environment variables: {', '.join(missing)}")
-        
+
         return cls(
             freshrss_url=os.getenv("FRESHRSS_URL", ""),
             freshrss_username=os.getenv("FRESHRSS_USERNAME", ""),

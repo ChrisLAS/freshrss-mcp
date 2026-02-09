@@ -1,13 +1,12 @@
 """Data models for FreshRSS MCP Server."""
 
 from dataclasses import dataclass
-from typing import Optional
 
 
 @dataclass
 class Article:
     """Represents a FreshRSS article with minimal fields for token efficiency."""
-    
+
     id: int
     title: str
     summary: str
@@ -16,7 +15,7 @@ class Article:
     feed_name: str
     is_read: bool
     is_starred: bool
-    
+
     def to_dict(self) -> dict:
         """Convert to dictionary for JSON serialization."""
         return {
@@ -34,12 +33,12 @@ class Article:
 @dataclass
 class Feed:
     """Represents a FreshRSS feed."""
-    
+
     id: int
     name: str
     url: str
     unread_count: int = 0
-    
+
     def to_dict(self) -> dict:
         """Convert to dictionary for JSON serialization."""
         return {
@@ -53,13 +52,13 @@ class Feed:
 @dataclass
 class FeedStats:
     """Statistics for a FreshRSS feed."""
-    
+
     feed_id: int
     feed_name: str
     unread_count: int
     total_count: int
     last_updated: int  # Unix timestamp
-    
+
     def to_dict(self) -> dict:
         """Convert to dictionary for JSON serialization."""
         return {

@@ -1,8 +1,8 @@
 """FreshRSS MCP Server - Model Context Protocol integration for FreshRSS."""
 
-from .server import main, mcp
-from .freshrss_client import FreshRSSClient, AuthenticationError
+from .freshrss_client import AuthenticationError, FreshRSSClient
 from .models import Article, Feed, FeedStats
+from .server import main, mcp
 
 __all__ = [
     "main",
