@@ -358,34 +358,29 @@ def main():
         f"Starting FreshRSS MCP Server on {config.mcp_server_host}:{config.mcp_server_port}"
     )
 
-    # Run with HTTP transport using uvicorn directly
+    # Run MCP server with SSE HTTP transport on configured host/port
     import uvicorn
     from starlette.applications import Starlette
-    from starlette.routing import Route
+    from starlette.routing import Mount
     from mcp.server.sse import SseServerTransport
-    
+
     sse = SseServerTransport("/messages/")
-    
+
     async def handle_sse(scope, receive, send):
-        async with sse.connect_sse(
-            scope, receive, send
-        ) as streams:
+        async with sse.connect_sse(scope, receive, send) as (read_stream, write_stream):
             await mcp._mcp_server.run(
-                streams[0], streams[1], mcp._mcp_server.create_initialization_options()
+                read_stream, write_stream, mcp._mcp_server.create_initialization_options()
             )
-    
-    async def handle_messages(scope, receive, send):
-        await sse.handle_post_message(scope, receive, send)
-    
-    starlette_app = Starlette(
+
+    app = Starlette(
         debug=False,
         routes=[
-            Route("/sse", endpoint=handle_sse),
-            Route("/messages/", endpoint=handle_messages, methods=["POST"]),
+            Mount("/", app=handle_sse),
+            Mount("/messages", app=sse.handle_post_message),
         ],
     )
-    
-    uvicorn.run(starlette_app, host=config.mcp_server_host, port=config.mcp_server_port)
+
+    uvicorn.run(app, host=config.mcp_server_host, port=config.mcp_server_port)
 
 
 if __name__ == "__main__":
