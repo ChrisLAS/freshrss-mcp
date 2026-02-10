@@ -366,16 +366,16 @@ def main():
     
     sse = SseServerTransport("/messages/")
     
-    async def handle_sse(request):
+    async def handle_sse(scope, receive, send):
         async with sse.connect_sse(
-            request.scope, request.receive, request.send
+            scope, receive, send
         ) as streams:
             await mcp._mcp_server.run(
                 streams[0], streams[1], mcp._mcp_server.create_initialization_options()
             )
     
-    async def handle_messages(request):
-        await sse.handle_post_message(request.scope, request.receive, request.send)
+    async def handle_messages(scope, receive, send):
+        await sse.handle_post_message(scope, receive, send)
     
     starlette_app = Starlette(
         debug=False,
