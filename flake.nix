@@ -196,6 +196,10 @@
 
                 Restart = "on-failure";
                 RestartSec = 5;
+
+                # Shutdown timeout - force stop after 10s if graceful shutdown fails
+                TimeoutStopSec = 10;
+                KillSignal = "SIGINT";
               };
             };
 
