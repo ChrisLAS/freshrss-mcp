@@ -367,7 +367,7 @@ def main():
     sse = SseServerTransport("/messages/")
     
     async def handle_sse(request):
-        async with sse.connect_session(
+        async with sse.connect_sse(
             request.scope, request.receive, request.send
         ) as streams:
             await mcp._mcp_server.run(
