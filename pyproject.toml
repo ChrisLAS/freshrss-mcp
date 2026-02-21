@@ -1,44 +1,43 @@
 [project]
-name = "freshrss-mcp-server"
-version = "0.1.0"
-description = "MCP server for FreshRSS integration with token optimization"
+name = "freshrss-mcp"
+version = "0.2.0"
+description = "MCP server for FreshRSS — Streamable HTTP transport for OpenClaw integration"
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.12,<4"
 dependencies = [
-    "mcp[cli]>=1.0.0",
-    "httpx>=0.27.0",
-    "pydantic>=2.0.0",
-]
-
-[project.optional-dependencies]
-dev = [
-    "pytest>=8.0.0",
-    "pytest-asyncio>=0.23.0",
-    "pytest-cov>=4.0.0",
-    "ruff>=0.5.0",
+    "fastmcp",
+    "httpx",
+    "pydantic-settings",
 ]
 
 [project.scripts]
-freshrss-mcp-server = "freshrss_mcp_server:main"
+freshrss-mcp = "freshrss_mcp.server:main"
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/freshrss_mcp_server"]
+packages = ["src/freshrss_mcp"]
+
+[dependency-groups]
+dev = [
+    "pytest",
+    "pytest-asyncio",
+    "respx",
+    "ruff",
+]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 asyncio_mode = "auto"
 
 [tool.ruff]
-target-version = "py311"
+target-version = "py313"
 line-length = 100
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "N", "W", "UP", "B", "C4", "SIM"]
-ignore = ["E501", "W293"]
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"

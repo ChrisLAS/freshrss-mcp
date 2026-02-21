@@ -1,4 +1,4 @@
-"""Entry point for FreshRSS MCP Server."""
+"""Entry point for python -m freshrss_mcp."""
 
 from .server import main
 
