@@ -50,8 +50,8 @@ freshrss-mcp/
 uv sync && uv run pytest -v
 
 # Start server (needs env vars)
-export FRESHRSS_URL="https://freshrss.trailertrash.io"
-export FRESHRSS_USERNAME="chrisf"
+export FRESHRSS_URL="https://freshrss.example.com"
+export FRESHRSS_USERNAME="youruser"
 export FRESHRSS_PASSWORD="..."
 export MCP_SERVER_PORT=8765
 uv run freshrss-mcp
@@ -61,22 +61,22 @@ uv run freshrss-mcp
 
 ## NixOS Integration
 
-The flake exports `nixosModules.default`. Host config (rvbee) at `/home/chrisf/build/config`:
+The flake exports `nixosModules.default`. Example host config:
 
 ```nix
 # In flake.nix inputs:
 freshrss-mcp.url = "github:ChrisLAS/freshrss-mcp";
 freshrss-mcp.inputs.nixpkgs.follows = "nixpkgs";
 
-# In rvbee modules:
+# In host modules:
 freshrss-mcp.nixosModules.default
 
 # In services config:
 services.freshrss-mcp-server = {
   enable = true;
-  freshRssUrl = "https://freshrss.trailertrash.io";
-  username = "chrisf";
-  passwordFile = "/home/chrisf/.config/secrets/freshrss-mcp";
+  freshRssUrl = "https://freshrss.example.com";
+  username = "youruser";
+  passwordFile = "/path/to/secrets/freshrss-mcp";
   port = 3005;
   host = "0.0.0.0";
 };
