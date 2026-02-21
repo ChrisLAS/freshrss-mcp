@@ -66,6 +66,11 @@ class FreshRSSClient:
         except Exception as e:
             raise AuthenticationError(f"Authentication error: {e}") from e
 
+    async def _ensure_authenticated(self) -> None:
+        """Authenticate lazily if no token is held yet."""
+        if not self._auth_token:
+            await self.authenticate()
+
     def _get_auth_headers(self) -> dict[str, str]:
         """Get headers with authentication token."""
         if not self._auth_token:
@@ -74,6 +79,7 @@ class FreshRSSClient:
 
     async def list_feeds(self) -> list[Feed]:
         """List all subscribed feeds."""
+        await self._ensure_authenticated()
         headers = self._get_auth_headers()
         url = f"{self.api_url}/reader/api/0/subscription/list"
 
@@ -99,6 +105,7 @@ class FreshRSSClient:
         Returns:
             Dictionary mapping feed_id to unread count
         """
+        await self._ensure_authenticated()
         headers = self._get_auth_headers()
         url = f"{self.api_url}/reader/api/0/unread-count"
 
@@ -130,6 +137,7 @@ class FreshRSSClient:
             include_read: Whether to include read articles
             since_timestamp: Only return articles published after this timestamp
         """
+        await self._ensure_authenticated()
         headers = self._get_auth_headers()
         stream_id = f"feed/{feed_id}" if feed_id else "user/-/state/com.google/reading-list"
         url = f"{self.api_url}/reader/api/0/stream/contents/{stream_id}"
@@ -176,6 +184,7 @@ class FreshRSSClient:
         remove_tags: list[str] | None = None,
     ) -> bool:
         """Edit tags on articles."""
+        await self._ensure_authenticated()
         headers = self._get_auth_headers()
         url = f"{self.api_url}/reader/api/0/edit-tag"
 
